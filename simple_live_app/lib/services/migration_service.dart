@@ -92,7 +92,14 @@ class MigrationService {
     if (curDBVer <= 10807) {
       var followList = DBService.instance.followBox.values.toList();
       for (FollowUser follow in followList) {
-        follow.watchDurationSec = follow.watchDuration!.toDuration().inSeconds;
+        try {
+          follow.watchDurationSec =
+              (follow.watchDuration != null && follow.watchDuration!.isNotEmpty)
+                  ? follow.watchDuration!.toDuration().inSeconds
+                  : 0;
+        } catch (_) {
+          follow.watchDurationSec = 0;
+        }
         DBService.instance.addFollow(follow);
       }
     }

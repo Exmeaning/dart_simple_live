@@ -44,6 +44,7 @@ import 'package:simple_live_core/simple_live_core.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main(List<String> arguments) async {
+  WidgetsFlutterBinding.ensureInitialized();
   final action = arguments.isEmpty ? null : arguments.first.toLowerCase();
   var path = (await getApplicationSupportDirectory()).path;
   if (!Platform.isAndroid && !Platform.isIOS) {
@@ -60,7 +61,6 @@ void main(List<String> arguments) async {
       return;
     }
   }
-  WidgetsFlutterBinding.ensureInitialized();
   // init-queue:
   // window(first)->migration->media_kit->Hive->services->start
   // window(second)->open
@@ -74,7 +74,11 @@ void main(List<String> arguments) async {
   await initServices();
   await initWindow();
 
-  await MigrationService.migrateDataByVersion();
+  try {
+    await MigrationService.migrateDataByVersion();
+  } catch (e, stackTrace) {
+    Log.e("Migration error: $e", stackTrace);
+  }
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   //设置状态栏为透明
   SystemUiOverlayStyle systemUiOverlayStyle = const SystemUiOverlayStyle(

@@ -1,16 +1,20 @@
 extension DurationStringExtensions on String {
   /// 将 "HH:MM:SS" 格式的字符串转换为 Duration
   Duration toDuration() {
-    final parts = split(':');
-    if (parts.length != 3) {
-      throw FormatException('Invalid duration format: $this');
+    try {
+      final parts = split(':');
+      if (parts.length != 3) {
+        return Duration.zero;
+      }
+
+      final hours = int.tryParse(parts[0]) ?? 0;
+      final minutes = int.tryParse(parts[1]) ?? 0;
+      final seconds = int.tryParse(parts[2]) ?? 0;
+
+      return Duration(hours: hours, minutes: minutes, seconds: seconds);
+    } catch (_) {
+      return Duration.zero;
     }
-
-    final hours = int.tryParse(parts[0]) ?? 0;
-    final minutes = int.tryParse(parts[1]) ?? 0;
-    final seconds = int.tryParse(parts[2]) ?? 0;
-
-    return Duration(hours: hours, minutes: minutes, seconds: seconds);
   }
 }
 
